@@ -7,8 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import com.mahmoudshaaban.titansapp.R
+import com.mahmoudshaaban.titansapp.ui.auth.state.LoginFields
 import com.mahmoudshaaban.titansapp.util.GenericApiResponse
 import com.mahmoudshaaban.titansapp.util.GenericApiResponse.*
+import kotlinx.android.synthetic.main.fragment_login.*
 
 
 class LoginFragment : BaseAuthFragment() {
@@ -26,27 +28,26 @@ class LoginFragment : BaseAuthFragment() {
 
         Log.d(TAG, "LoginFragment: ${viewModel.hashCode()}")
 
-        viewModel.testLogin().observe(viewLifecycleOwner, Observer { response ->
+        subscribeObservers()
+    }
 
-            when (response) {
-                is ApiSuccessResponse -> {
-                    Log.d(TAG, "LOGIN RESPONSE :  ${response.body}")
-
-                }
-                is ApiErrorResponse -> {
-                    Log.d(TAG, "LOGIN RESPONSE: ${response.errorMessage}")
-
-                }
-                is ApiEmptyResponse -> {
-                    Log.d(TAG, "LOGIN RESPONSE : EMPTY RESPONSE ")
-
-                }
+    fun subscribeObservers() {
+        viewModel.viewState.observe(viewLifecycleOwner, Observer {
+            it.loginFields?.let { loginfields ->
+                loginfields.login_email?.let { input_email.setText(it) }
+                loginfields.login_password?.let { input_password.setText(it) }
             }
-
-
         })
+    }
 
-
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewModel.setLoginFields(
+            LoginFields(
+                input_email.text.toString() ,
+                input_password.text.toString()
+            )
+        )
     }
 
 

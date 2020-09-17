@@ -7,7 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import com.mahmoudshaaban.titansapp.R
+import com.mahmoudshaaban.titansapp.ui.auth.state.LoginFields
+import com.mahmoudshaaban.titansapp.ui.auth.state.RegisterationFields
 import com.mahmoudshaaban.titansapp.util.GenericApiResponse
+import kotlinx.android.synthetic.main.fragment_login.*
+import kotlinx.android.synthetic.main.fragment_login.input_email
+import kotlinx.android.synthetic.main.fragment_login.input_password
+import kotlinx.android.synthetic.main.fragment_register.*
 
 
 class RegisterFragment : BaseAuthFragment() {
@@ -26,27 +32,31 @@ class RegisterFragment : BaseAuthFragment() {
         Log.d(TAG, "RegisterFragment: ${viewModel.hashCode()}")
 
 
-        viewModel.testRegister().observe(viewLifecycleOwner, Observer { response ->
+      subscribeObservers()
 
-            when (response) {
-                is GenericApiResponse.ApiSuccessResponse -> {
-                    Log.d(TAG, "REGISTER RESPONSE :  ${response.body}")
+    }
 
-                }
-                is GenericApiResponse.ApiErrorResponse -> {
-                    Log.d(TAG, "REGISTER RESPONSE: ${response.errorMessage}")
-
-                }
-                is GenericApiResponse.ApiEmptyResponse -> {
-                    Log.d(TAG, "REGISTER RESPONSE : EMPTY RESPONSE ")
-
-                }
+    fun subscribeObservers() {
+        viewModel.viewState.observe(viewLifecycleOwner, Observer {
+            it.registerationFields?.let { registerationFields ->
+                registerationFields.registeration_email?.let {  input_email.setText(it) }
+                registerationFields.registeration_username?.let {input_username.setText(it) }
+                registerationFields.registeration_password?.let {input_password.setText(it) }
+                registerationFields.registeration_confirmPassword?.let {input_password_confirm.setText(it) }
             }
-
-
         })
+    }
 
-
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewModel.setRegisterationFields(
+            RegisterationFields(
+                input_email.text.toString() ,
+                input_username.text.toString() ,
+                input_password.text.toString() ,
+                input_password_confirm.text.toString()
+            )
+        )
     }
 
 }
