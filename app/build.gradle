@@ -11,7 +11,7 @@ android {
     defaultConfig {
         applicationId "com.mahmoudshaaban.titansapp"
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
 
@@ -51,6 +51,12 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+
+
+
+    
+    def fragment = "1.2.0-alpha02"
+    implementation "androidx.fragment:fragment-ktx:$fragment"
 
     // -- Retrofit2
     def retrofit2_version = "2.6.0"

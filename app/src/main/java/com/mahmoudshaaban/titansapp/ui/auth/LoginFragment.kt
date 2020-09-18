@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import com.mahmoudshaaban.titansapp.R
+import com.mahmoudshaaban.titansapp.models.AuthToken
 import com.mahmoudshaaban.titansapp.ui.auth.state.LoginFields
 import com.mahmoudshaaban.titansapp.util.GenericApiResponse
 import com.mahmoudshaaban.titansapp.util.GenericApiResponse.*
@@ -29,6 +30,13 @@ class LoginFragment : BaseAuthFragment() {
         Log.d(TAG, "LoginFragment: ${viewModel.hashCode()}")
 
         subscribeObservers()
+
+        login_button.setOnClickListener{
+            // set auth token to the view model
+            viewModel.setAuthToken(
+                AuthToken(1 , "1515511551")
+            )
+        }
     }
 
     fun subscribeObservers() {
