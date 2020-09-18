@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import com.mahmoudshaaban.titansapp.R
 
 
-class ForgetPasswordFragment : BaseAuthFragment() {
+class   ForgetPasswordFragment : BaseAuthFragment() {
 
 
     override fun onCreateView(

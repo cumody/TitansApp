@@ -19,48 +19,49 @@ import javax.inject.Inject
 
 class AuthViewModel
 @Inject
-constructor
-    (val authRepository: AuthRepository)
-    : BaseViewModel<AuthStateEvent, AuthViewState>() {
-
-
-    override fun initViewState(): AuthViewState {
-
-        return AuthViewState()
-    }
-
+constructor(
+    val authRepository: AuthRepository
+): BaseViewModel<AuthStateEvent, AuthViewState>()
+{
     override fun handleStateEvent(stateEvent: AuthStateEvent): LiveData<DataState<AuthViewState>> {
+        when(stateEvent){
 
-        when (stateEvent) {
             is LoginAttemptEvent -> {
-                return AbsentLiveData.create()
-
+                return authRepository.attemptLogin(
+                    stateEvent.email,
+                    stateEvent.password
+                )
             }
+
             is RegisterAttemptEvent -> {
-                return AbsentLiveData.create()
-
-
+                return authRepository.attemptRegisteration(
+                    stateEvent.email,
+                    stateEvent.username,
+                    stateEvent.password,
+                    stateEvent.confirmPassword
+                )
             }
+
             is CheckPreviousAuthEvent -> {
                 return AbsentLiveData.create()
-
             }
+
+
         }
     }
 
-    fun setRegisterationFields(registerationFields: RegisterationFields){
+    fun setRegistrationFields(registrationFields: RegisterationFields){
         val update = getCurrentViewStateOrNew()
-        if (update.registerationFields == registerationFields){
+        if(update.registerationFields == registrationFields){
             return
         }
-        update.registerationFields = registerationFields
+        update.registerationFields = registrationFields
         _viewState.value = update
-
     }
 
     fun setLoginFields(loginFields: LoginFields){
         val update = getCurrentViewStateOrNew()
-        if (update.loginFields == loginFields){
+        if(update.loginFields == loginFields){
             return
         }
         update.loginFields = loginFields
@@ -69,12 +70,17 @@ constructor
 
     fun setAuthToken(authToken: AuthToken){
         val update = getCurrentViewStateOrNew()
-        if (update.authToken == authToken){
+        if(update.authToken == authToken){
             return
         }
         update.authToken = authToken
         _viewState.value = update
     }
 
-
+    override fun initViewState(): AuthViewState {
+        return AuthViewState()
+    }
 }
+
+
+

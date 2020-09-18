@@ -6,17 +6,17 @@ import com.mahmoudshaaban.titansapp.models.AccountProperties
 import com.mahmoudshaaban.titansapp.models.AuthToken
 
 @Database(entities = [AuthToken::class, AccountProperties::class], version = 1)
-abstract class AppDatabase : RoomDatabase() {
+abstract class AppDatabase: RoomDatabase() {
 
     abstract fun getAuthTokenDao(): AuthTokenDao
+
     abstract fun getAccountPropertiesDao(): AccountPropertiesDao
 
-    companion object {
-
-        const val APP_DATABASE = "app_ name"
-
-
+    companion object{
+        val DATABASE_NAME: String = "app_db"
     }
 
 
 }
+
+

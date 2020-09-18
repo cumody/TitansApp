@@ -11,7 +11,7 @@ import com.google.gson.GsonBuilder
 import com.mahmoudshaaban.titansapp.R
 import com.mahmoudshaaban.titansapp.persistence.AccountPropertiesDao
 import com.mahmoudshaaban.titansapp.persistence.AppDatabase
-import com.mahmoudshaaban.titansapp.persistence.AppDatabase.Companion.APP_DATABASE
+import com.mahmoudshaaban.titansapp.persistence.AppDatabase.Companion.DATABASE_NAME
 import com.mahmoudshaaban.titansapp.persistence.AuthTokenDao
 import com.mahmoudshaaban.titansapp.util.Constants
 import com.mahmoudshaaban.titansapp.util.LiveDataCallAdapterFactory
@@ -46,7 +46,7 @@ class AppModule{
     @Provides
     fun provideAppDb(app: Application): AppDatabase {
         return Room
-            .databaseBuilder(app, AppDatabase::class.java, APP_DATABASE)
+            .databaseBuilder(app, AppDatabase::class.java, DATABASE_NAME)
             .fallbackToDestructiveMigration() // get correct db version if schema changed
             .build()
     }

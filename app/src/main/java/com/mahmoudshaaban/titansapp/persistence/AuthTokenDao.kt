@@ -7,9 +7,11 @@ import com.mahmoudshaaban.titansapp.models.AuthToken
 interface AuthTokenDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAuth(authToken: AuthToken)
+    suspend fun insert(authToken: AuthToken): Long
 
-    @Query("UPDATE auth_token SET token = NULL WHERE account_pk = :pk")
+    @Query("UPDATE auth_token SET token = null WHERE account_pk = :pk")
     fun nullifyToken(pk: Int): Int
 
+
 }
+

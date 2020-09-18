@@ -13,17 +13,16 @@ import com.mahmoudshaaban.titansapp.models.AccountProperties
 interface AccountPropertiesDao {
 
     // Replace mean if the row already exists replace it with the data we come with that
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertOrReplace(accountProperties: AccountProperties): Long
-
-    // Ignore mean if the row already exists Ignore the data we come from
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertOrIgnore(accountProperties: AccountProperties): Long
+    @Query("SELECT * FROM account_properties WHERE email = :email")
+    suspend fun searchByEmail(email: String): AccountProperties?
 
     @Query("SELECT * FROM account_properties WHERE pk = :pk")
-    fun searchByPk(pk: Int): AccountProperties?
+    fun searchByPk(pk: Int): LiveData<AccountProperties>
 
-    @Query("SELECT * FROM account_properties WHERE email = :email")
-    fun searchByEmail(email: String): AccountProperties?
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAndReplace(accountProperties: AccountProperties): Long
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insertOrIgnore(accountProperties: AccountProperties): Long
 
 }

@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import com.mahmoudshaaban.titansapp.R
 import com.mahmoudshaaban.titansapp.models.AuthToken
+import com.mahmoudshaaban.titansapp.ui.auth.state.AuthStateEvent
+import com.mahmoudshaaban.titansapp.ui.auth.state.AuthStateEvent.*
 import com.mahmoudshaaban.titansapp.ui.auth.state.LoginFields
 import com.mahmoudshaaban.titansapp.util.GenericApiResponse
 import com.mahmoudshaaban.titansapp.util.GenericApiResponse.*
@@ -26,37 +28,41 @@ class LoginFragment : BaseAuthFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        Log.d(TAG, "LoginFragment: ${viewModel.hashCode()}")
+        Log.d(TAG, "LoginFragment: ${viewModel}")
 
         subscribeObservers()
 
-        login_button.setOnClickListener{
-            // set auth token to the view model
-            viewModel.setAuthToken(
-                AuthToken(1 , "1515511551")
-            )
+        login_button.setOnClickListener {
+            login()
         }
     }
 
-    fun subscribeObservers() {
-        viewModel.viewState.observe(viewLifecycleOwner, Observer {
-            it.loginFields?.let { loginfields ->
-                loginfields.login_email?.let { input_email.setText(it) }
-                loginfields.login_password?.let { input_password.setText(it) }
+    fun subscribeObservers(){
+        viewModel.viewState.observe(viewLifecycleOwner, Observer{
+            it.loginFields?.let{
+                it.login_email?.let{input_email.setText(it)}
+                it.login_password?.let{input_password.setText(it)}
             }
         })
+    }
+
+    fun login(){
+        viewModel.setStateEvent(
+            LoginAttemptEvent(
+                input_email.text.toString(),
+                input_password.text.toString()
+            )
+        )
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         viewModel.setLoginFields(
             LoginFields(
-                input_email.text.toString() ,
+                input_email.text.toString(),
                 input_password.text.toString()
             )
         )
     }
-
 
 }
