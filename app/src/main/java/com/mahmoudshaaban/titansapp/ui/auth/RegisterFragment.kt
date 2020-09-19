@@ -1,21 +1,20 @@
 package com.mahmoudshaaban.titansapp.ui.auth
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
+
 import com.mahmoudshaaban.titansapp.R
 import com.mahmoudshaaban.titansapp.ui.auth.state.AuthStateEvent
-import com.mahmoudshaaban.titansapp.ui.auth.state.LoginFields
+import com.mahmoudshaaban.titansapp.ui.auth.state.AuthStateEvent.*
 import com.mahmoudshaaban.titansapp.ui.auth.state.RegisterationFields
-import com.mahmoudshaaban.titansapp.ui.main.MainActivity
-import com.mahmoudshaaban.titansapp.util.GenericApiResponse
-import kotlinx.android.synthetic.main.fragment_login.*
-import kotlinx.android.synthetic.main.fragment_login.input_email
-import kotlinx.android.synthetic.main.fragment_login.input_password
+import com.mahmoudshaaban.titansapp.util.ApiEmptyResponse
+import com.mahmoudshaaban.titansapp.util.ApiErrorResponse
+import com.mahmoudshaaban.titansapp.util.ApiSuccessResponse
 import kotlinx.android.synthetic.main.fragment_register.*
 
 
@@ -52,7 +51,7 @@ class RegisterFragment : BaseAuthFragment() {
 
     fun register(){
         viewModel.setStateEvent(
-            AuthStateEvent.RegisterAttemptEvent(
+            RegisterAttemptEvent(
                 input_email.text.toString(),
                 input_username.text.toString(),
                 input_password.text.toString(),

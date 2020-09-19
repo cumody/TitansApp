@@ -47,11 +47,7 @@ class LoginFragment : BaseAuthFragment() {
     }
 
     fun login(){
-        viewModel.setStateEvent(
-            LoginAttemptEvent(
-                input_email.text.toString(),
-                input_password.text.toString()
-            )
+        viewModel.setStateEvent(LoginAttemptEvent(input_email.text.toString(), input_password.text.toString())
         )
     }
 
@@ -66,3 +62,5 @@ class LoginFragment : BaseAuthFragment() {
     }
 
 }
+
+

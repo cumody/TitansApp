@@ -1,24 +1,25 @@
 package com.mahmoudshaaban.titansapp.ui
 
 
-data class Loading( val loading : Boolean)
-data class Data<T>(val data: Event<T>, val response: Event<Response>?)
-data class StateError(val response : Response )
+data class Loading(val isLoading: Boolean)
+data class Data<T>(val data: Event<T>?, val response: Event<Response>?)
+data class StateError(val response: Response)
 
-data class Response(val message : String? , val responseType : ResponseType)
 
+data class Response(val message: String?, val responseType: ResponseType)
 sealed class ResponseType{
 
-    class Toast : ResponseType()
+    class Toast: ResponseType()
 
-    class Dialog : ResponseType()
+    class Dialog: ResponseType()
 
-    class None : ResponseType()
-
+    class None: ResponseType()
 }
 
 
-
+/**
+ * Used as a wrapper for data that is exposed via a LiveData that represents an event.
+ */
 open class Event<out T>(private val content: T) {
 
     var hasBeenHandled = false
@@ -45,12 +46,12 @@ open class Event<out T>(private val content: T) {
         return "Event(content=$content, hasBeenHandled=$hasBeenHandled)"
     }
 
-    companion object {
+    companion object{
 
         private val TAG: String = "AppDebug"
 
         // we don't want an event if the data is null
-        fun <T> dataEvent(data: T?): Event<T>? {
+        fun <T> dataEvent(data: T?): Event<T>?{
             data?.let {
                 return Event(it)
             }
@@ -58,11 +59,13 @@ open class Event<out T>(private val content: T) {
         }
 
         // we don't want an event if the response is null
-        fun responseEvent(response: Response?): Event<Response>? {
-            response?.let {
+        fun responseEvent(response: Response?): Event<Response>?{
+            response?.let{
                 return Event(response)
             }
             return null
         }
     }
+
+
 }

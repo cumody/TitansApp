@@ -4,9 +4,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.Observer
-import com.mahmoudshaaban.titansapp.ui.auth.AuthActivity
 import com.mahmoudshaaban.titansapp.R
 import com.mahmoudshaaban.titansapp.ui.BaseActivity
+import com.mahmoudshaaban.titansapp.ui.auth.AuthActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : BaseActivity() {

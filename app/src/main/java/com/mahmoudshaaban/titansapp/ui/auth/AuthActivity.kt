@@ -96,10 +96,3 @@ class AuthActivity : BaseActivity(){
 
 
 
-
-
-
-
-
-
-

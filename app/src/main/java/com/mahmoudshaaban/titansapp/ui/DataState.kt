@@ -29,14 +29,11 @@ data class DataState<T>(
             return DataState(
                 error = null,
                 loading = Loading(isLoading),
-                // we won't to create an event if the data is null
-                data = Event.dataEvent(
-                    cachedData
-                )?.let {
-                    Data(
-                        it, null
-                    )
-                }
+                data = Data(
+                    Event.dataEvent(
+                        cachedData
+                    ), null
+                )
             )
         }
 
@@ -47,14 +44,10 @@ data class DataState<T>(
             return DataState(
                 error = null,
                 loading = Loading(false),
-                data = Event.dataEvent(data)?.let {
-                    Event.responseEvent(response)?.let { it1 ->
-                        Data(
-                            it,
-                            it1
-                        )
-                    }
-                }
+                data = Data(
+                    Event.dataEvent(data),
+                    Event.responseEvent(response)
+                )
             )
         }
     }

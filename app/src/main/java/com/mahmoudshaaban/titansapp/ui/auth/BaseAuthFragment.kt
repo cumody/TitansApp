@@ -7,16 +7,14 @@ import com.mahmoudshaaban.titansapp.viewmodels.ViewModelProviderFactory
 import dagger.android.support.DaggerFragment
 import javax.inject.Inject
 
-abstract class BaseAuthFragment : DaggerFragment() {
+abstract class BaseAuthFragment: DaggerFragment(){
 
-      val TAG : String = "AppDebug"
-
+    val TAG: String = "AppDebug"
 
     @Inject
     lateinit var providerFactory: ViewModelProviderFactory
 
     lateinit var viewModel: AuthViewModel
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -25,4 +23,6 @@ abstract class BaseAuthFragment : DaggerFragment() {
             ViewModelProvider(this, providerFactory).get(AuthViewModel::class.java)
         } ?: throw Exception("Invalid Activity")
     }
+
 }
+

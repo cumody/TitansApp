@@ -34,7 +34,7 @@ constructor(
             }
 
             is RegisterAttemptEvent -> {
-                return authRepository.attemptRegisteration(
+                return authRepository.attemptRegistration(
                     stateEvent.email,
                     stateEvent.username,
                     stateEvent.password,
@@ -77,7 +77,8 @@ constructor(
         _viewState.value = update
     }
 
-    override fun initViewState(): AuthViewState {
+
+    override fun initNewViewState(): AuthViewState {
         return AuthViewState()
     }
 }
