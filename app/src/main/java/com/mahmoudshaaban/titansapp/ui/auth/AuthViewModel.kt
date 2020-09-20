@@ -81,6 +81,16 @@ constructor(
     override fun initNewViewState(): AuthViewState {
         return AuthViewState()
     }
+
+    fun cancelActiveJobs(){
+        authRepository.cancelActiveJobs()
+    }
+
+    // if viewmodel cleared from memory
+    override fun onCleared() {
+        super.onCleared()
+        cancelActiveJobs()
+    }
 }
 
 
