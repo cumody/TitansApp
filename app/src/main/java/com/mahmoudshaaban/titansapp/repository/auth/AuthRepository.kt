@@ -1,11 +1,13 @@
 package com.mahmoudshaaban.titansapp.repository.auth
 
+import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.switchMap
 import com.mahmoudshaaban.titansapp.api.auth.OpenApiAuthService
 import com.mahmoudshaaban.titansapp.api.network_responses.LoginResponse
 import com.mahmoudshaaban.titansapp.api.network_responses.RegistrationResponse
+import com.mahmoudshaaban.titansapp.models.AccountProperties
 import com.mahmoudshaaban.titansapp.models.AuthToken
 import com.mahmoudshaaban.titansapp.persistence.AccountPropertiesDao
 import com.mahmoudshaaban.titansapp.persistence.AuthTokenDao
@@ -17,12 +19,11 @@ import com.mahmoudshaaban.titansapp.ui.ResponseType
 import com.mahmoudshaaban.titansapp.ui.auth.state.AuthViewState
 import com.mahmoudshaaban.titansapp.ui.auth.state.LoginFields
 import com.mahmoudshaaban.titansapp.ui.auth.state.RegisterationFields
-import com.mahmoudshaaban.titansapp.util.ApiEmptyResponse
-import com.mahmoudshaaban.titansapp.util.ApiErrorResponse
-import com.mahmoudshaaban.titansapp.util.ApiSuccessResponse
+import com.mahmoudshaaban.titansapp.util.*
+import com.mahmoudshaaban.titansapp.util.ErrorHandling.Companion.ERROR_SAVE_AUTH_TOKEN
 import com.mahmoudshaaban.titansapp.util.ErrorHandling.Companion.ERROR_UNKNOWN
 import com.mahmoudshaaban.titansapp.util.ErrorHandling.Companion.GENERIC_AUTH_ERROR
-import com.mahmoudshaaban.titansapp.util.GenericApiResponse
+import com.mahmoudshaaban.titansapp.util.SuccessHandling.Companion.RESPONSE_CHECK_PREVIOUS_AUTH_USER_DONE
 import kotlinx.coroutines.Job
 import javax.inject.Inject
 import kotlin.math.log
@@ -33,7 +34,9 @@ constructor(
     val authTokenDao: AuthTokenDao,
     val accountPropertiesDao: AccountPropertiesDao,
     val openApiAuthService: OpenApiAuthService,
-    val sessionManager: SessionManager
+    val sessionManager: SessionManager ,
+    val sharedPreferences: SharedPreferences ,
+    val sharedPrefsEditor : SharedPreferences.Editor
 ) {
 
     private val TAG = "AppDebug"
@@ -47,7 +50,8 @@ constructor(
         }
 
         return object : NetworkBoundResource<LoginResponse, AuthViewState>(
-            sessionManager.isConnectedToTheInternet()
+            sessionManager.isConnectedToTheInternet() ,
+            true
         ) {
             override suspend fun handleApiSuccessResponse(response: ApiSuccessResponse<LoginResponse>) {
                 Log.d(TAG, "handleApiSuccessResponse ${response}}")
@@ -57,6 +61,31 @@ constructor(
                     return onErrorReturn(response.body.errorMessage, true, false)
 
                 }
+
+                // don't care about result , Just insert if it doesn't exist b/c foreign key relationship
+                // WITH AUTH TOKEN TABLE
+                accountPropertiesDao.insertOrIgnore(
+                    AccountProperties(
+                        response.body.pk,
+                        response.body.email,
+                        ""
+                    )
+                )
+                // will return -1 if failure
+                val result = authTokenDao.insert(
+                    AuthToken(response.body.pk
+                    , response.body.token)
+                )
+                if (result < 0){
+                    return onCompleteJob(
+                        DataState.error(
+                            Response(ERROR_SAVE_AUTH_TOKEN , ResponseType.Dialog())
+                        )
+                    )
+                }
+
+                saveAuthenticatedUserToPrefs(email)
+
                 onCompleteJob(
                     DataState.data(
                         data = AuthViewState(
@@ -80,9 +109,16 @@ constructor(
 
             }
 
+            // not used in this case
+            override suspend fun createCacheRequestAndReturn() {
+
+            }
+
         }.asLiveData()
 
     }
+
+
 
     fun attemptRegistration(
         email: String,
@@ -102,8 +138,15 @@ constructor(
         }
 
         return object : NetworkBoundResource<RegistrationResponse, AuthViewState>(
-            sessionManager.isConnectedToTheInternet()
+            sessionManager.isConnectedToTheInternet() ,
+            true
         ) {
+
+            // not used in this case
+            override suspend fun createCacheRequestAndReturn() {
+
+            }
+
             override suspend fun handleApiSuccessResponse(response: ApiSuccessResponse<RegistrationResponse>) {
 
                 Log.d(TAG, "handleApiSuccessResponse: ${response}")
@@ -111,6 +154,11 @@ constructor(
                 if (response.body.response.equals(GENERIC_AUTH_ERROR)) {
                     return onErrorReturn(response.body.errorMessage, true, false)
                 }
+
+
+                saveAuthenticatedUserToPrefs(email)
+
+
 
                 onCompleteJob(
                     DataState.data(
@@ -125,12 +173,93 @@ constructor(
                 return openApiAuthService.register(email, username, password, confirmPassword)
             }
 
+
+
             override fun setJob(job: Job) {
                 repositoryJob?.cancel()
                 repositoryJob = job
             }
 
         }.asLiveData()
+    }
+
+    fun checkPreviousAuthUser() : LiveData<DataState<AuthViewState>>{
+        val previousAuthUserEmail : String? =
+            sharedPreferences.getString(PreferenceKeys.PREVIOUS_AUTH_USER , null)
+        if (previousAuthUserEmail.isNullOrBlank()){
+            Log.d(TAG, "checkPreviousAuthUser: No Previously authenticated user found ..")
+            return returnNoTokenFound()
+        }
+        return object : NetworkBoundResource<Void , AuthViewState>(
+            sessionManager.isConnectedToTheInternet() ,
+            false
+        ) {
+            override suspend fun createCacheRequestAndReturn() {
+                accountPropertiesDao.searchByEmail(previousAuthUserEmail).let { accountProperties ->
+                    Log.d(TAG, "checkPreviousAuthUser: searching for the token: $accountProperties ")
+
+                    accountProperties?.let {
+                        if (accountProperties.pk > -1 ){
+                            authTokenDao.searchByPk(accountProperties.pk).let {authtoken->
+                                if (authtoken != null){
+                                    onCompleteJob(
+                                        DataState.data(data = AuthViewState(
+                                            authToken = authtoken
+                                        ))
+                                    )
+                                    return
+                                }
+                            }
+                        }
+                    }
+                    Log.d(TAG, "checkPreviousAuthUser: AuthToken notfound ... ")
+                    onCompleteJob(
+                        DataState.data(
+                            data = null,
+                            response = Response(
+                                RESPONSE_CHECK_PREVIOUS_AUTH_USER_DONE ,
+                                ResponseType.None()
+                            )
+                        )
+                    )
+                }
+            }
+
+            // not used in this case
+            override suspend fun handleApiSuccessResponse(response: ApiSuccessResponse<Void>) {
+
+            }
+
+            // not used in this case
+            override fun createCall(): LiveData<GenericApiResponse<Void>> {
+                return AbsentLiveData.create()
+            }
+
+            override fun setJob(job: Job) {
+                repositoryJob?.cancel()
+                repositoryJob = job
+            }
+
+        }.asLiveData()
+    }
+
+    private fun returnNoTokenFound(): LiveData<DataState<AuthViewState>> {
+        return object : LiveData<DataState<AuthViewState>>(){
+            override fun onActive() {
+                super.onActive()
+                value = DataState.data(
+                    data = null ,
+                    response = Response(RESPONSE_CHECK_PREVIOUS_AUTH_USER_DONE , ResponseType.None())
+                )
+            }
+        }
+
+    }
+
+    private fun saveAuthenticatedUserToPrefs(email: String) {
+        sharedPrefsEditor.putString(PreferenceKeys.PREVIOUS_AUTH_USER, email)
+        sharedPrefsEditor.apply()
+
     }
 
 

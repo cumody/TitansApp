@@ -2,6 +2,8 @@ package com.mahmoudshaaban.titansapp.di
 
 
 import android.app.Application
+import android.content.Context
+import android.content.SharedPreferences
 import androidx.room.Room
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
@@ -15,6 +17,7 @@ import com.mahmoudshaaban.titansapp.persistence.AppDatabase.Companion.DATABASE_N
 import com.mahmoudshaaban.titansapp.persistence.AuthTokenDao
 import com.mahmoudshaaban.titansapp.util.Constants
 import com.mahmoudshaaban.titansapp.util.LiveDataCallAdapterFactory
+import com.mahmoudshaaban.titansapp.util.PreferenceKeys
 import dagger.Module
 import dagger.Provides
 import retrofit2.Retrofit
@@ -24,6 +27,19 @@ import javax.inject.Singleton
 
 @Module
 class AppModule{
+
+
+    @Singleton
+    @Provides
+    fun provideSharedPreferences(application: Application) : SharedPreferences {
+        return application.getSharedPreferences(PreferenceKeys.APP_PREFERENCES , Context.MODE_PRIVATE)
+    }
+
+    @Singleton
+    @Provides
+    fun provideSharedPreferencesEditor(sharedPreferences: SharedPreferences) : SharedPreferences.Editor {
+        return sharedPreferences.edit()
+    }
 
 
     @Singleton
@@ -77,5 +93,6 @@ class AppModule{
         return Glide.with(application)
             .setDefaultRequestOptions(requestOptions)
     }
+
 
 }

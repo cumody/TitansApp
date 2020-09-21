@@ -14,6 +14,7 @@ import com.mahmoudshaaban.titansapp.R
 import com.mahmoudshaaban.titansapp.ui.BaseActivity
 import com.mahmoudshaaban.titansapp.ui.ResponseType
 import com.mahmoudshaaban.titansapp.ui.auth.AuthViewModel
+import com.mahmoudshaaban.titansapp.ui.auth.state.AuthStateEvent
 import com.mahmoudshaaban.titansapp.viewmodels.ViewModelProviderFactory
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
@@ -34,6 +35,7 @@ class AuthActivity : BaseActivity() , NavController.OnDestinationChangedListener
         findNavController(R.id.auth_nav_host_fragment).addOnDestinationChangedListener(this)
 
         subscribeObservers()
+        checkPreviousAuthUser()
     }
 
     private fun subscribeObservers(){
@@ -67,6 +69,11 @@ class AuthActivity : BaseActivity() , NavController.OnDestinationChangedListener
                 }
             }
         })
+    }
+
+
+    fun checkPreviousAuthUser(){
+        viewModel.setStateEvent(AuthStateEvent.CheckPreviousAuthEvent())
     }
 
     fun navMainActivity(){
