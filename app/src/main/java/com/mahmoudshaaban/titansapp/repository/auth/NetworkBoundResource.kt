@@ -151,6 +151,7 @@ abstract class NetworkBoundResource<ResponseObject, ViewStateType>
     private fun initNewJob(): Job {
         Log.d(TAG, "initNewJob: called...")
         job = Job()
+        // this will called if the job completed or canceled
         job.invokeOnCompletion(
             onCancelling = true,
             invokeImmediately = true,
@@ -184,5 +185,6 @@ abstract class NetworkBoundResource<ResponseObject, ViewStateType>
 
     abstract fun createCall(): LiveData<GenericApiResponse<ResponseObject>>
 
+    // we need a reference to a job in the repository b/c if we cancel it
     abstract fun setJob(job: Job)
 }
