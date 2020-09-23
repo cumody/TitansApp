@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
+import com.google.android.material.appbar.AppBarLayout
 import com.mahmoudshaaban.titansapp.ui.main.MainActivity
 import com.mahmoudshaaban.titansapp.R
 import com.mahmoudshaaban.titansapp.ui.BaseActivity
@@ -37,6 +38,8 @@ class AuthActivity : BaseActivity() , NavController.OnDestinationChangedListener
         subscribeObservers()
         checkPreviousAuthUser()
     }
+
+
 
     private fun subscribeObservers(){
 
@@ -97,6 +100,10 @@ class AuthActivity : BaseActivity() , NavController.OnDestinationChangedListener
         } else {
             progress_bar.visibility = View.INVISIBLE
         }
+    }
+
+    override fun expandAppBar() {
+        //findViewById<AppBarLayout>(R.id.app_bar).setExpanded(true)
     }
 }
 

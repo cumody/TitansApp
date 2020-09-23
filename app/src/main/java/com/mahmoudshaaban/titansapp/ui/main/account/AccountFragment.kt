@@ -10,8 +10,7 @@ import javax.inject.Inject
 
 class AccountFragment : BaseAccountFragment() {
 
-    @Inject
-    lateinit var sessionManager: SessionManager
+
 
 
     override fun onCreateView(
@@ -30,7 +29,7 @@ class AccountFragment : BaseAccountFragment() {
             findNavController().navigate(R.id.action_accountFragment_to_changePasswordFragment)
         }
         logout_button.setOnClickListener {
-            sessionManager.logout()
+           viewModel.logout()
 
         }
     }

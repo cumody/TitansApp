@@ -8,6 +8,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.NavController
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.mahmoudshaaban.titansapp.R
 import com.mahmoudshaaban.titansapp.ui.BaseActivity
@@ -85,6 +86,8 @@ class MainActivity : BaseActivity(),
 
     }
 
+
+
     fun subscribeObservers() {
         sessionManager.cachedToken.observe(this, Observer { authToken ->
             Log.d(TAG, "MainActivity, subscribeObservers: ViewState: ${authToken}")
@@ -118,7 +121,7 @@ class MainActivity : BaseActivity(),
     }
 
     override fun onGraphChange() {
-        // TODO what needs to happen when the graph changes ?
+        expandAppBar()
 
     }
 
@@ -140,5 +143,9 @@ class MainActivity : BaseActivity(),
             // DO NOTHING
         }
 
+    }
+
+    override fun expandAppBar() {
+        findViewById<AppBarLayout>(R.id.app_bar).setExpanded(true)
     }
 }
