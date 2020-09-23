@@ -1,9 +1,8 @@
 package com.mahmoudshaaban.titansapp.ui.main.blog
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import androidx.navigation.fragment.findNavController
 import com.mahmoudshaaban.titansapp.R
 
 class ViewBlogFragment : BaseBlogFragment(){
@@ -19,5 +18,38 @@ class ViewBlogFragment : BaseBlogFragment(){
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+
+        // TODO check if the user is author of blog post
+        val isAuhorOfBlogPost = true
+        if (isAuhorOfBlogPost){
+            inflater.inflate(R.menu.edit_view_menu,menu)
+        }
+
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        val isAuhorOfBlogPost = true
+        if (isAuhorOfBlogPost){
+
+            when(item?.itemId){
+                R.id.edit -> {
+                    navUpdateBlogFragment()
+                    return true
+                }
+            }
+        }
+        return super.onOptionsItemSelected(item)
+
+
+    }
+
+    fun navUpdateBlogFragment(){
+        findNavController().navigate(R.id.action_viewBlogFragment_to_updateBlogFragment)
     }
 }
