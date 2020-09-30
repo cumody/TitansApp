@@ -16,17 +16,30 @@ import com.mahmoudshaaban.titansapp.ui.BaseActivity
 import com.mahmoudshaaban.titansapp.ui.ResponseType
 import com.mahmoudshaaban.titansapp.ui.auth.AuthViewModel
 import com.mahmoudshaaban.titansapp.ui.auth.state.AuthStateEvent
+import com.mahmoudshaaban.titansapp.util.SuccessHandling.Companion.RESPONSE_CHECK_PREVIOUS_AUTH_USER_DONE
 import com.mahmoudshaaban.titansapp.viewmodels.ViewModelProviderFactory
+import kotlinx.android.synthetic.main.activity_auth.*
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_main.progress_bar
 import javax.inject.Inject
 
-class AuthActivity : BaseActivity() , NavController.OnDestinationChangedListener{
+class AuthActivity : BaseActivity(),
+    NavController.OnDestinationChangedListener
+{
+
+    override fun onDestinationChanged(
+        controller: NavController,
+        destination: NavDestination,
+        arguments: Bundle?
+    ) {
+        viewModel.cancelActiveJobs()
+    }
+
 
     @Inject
     lateinit var providerFactory: ViewModelProviderFactory
 
     lateinit var viewModel: AuthViewModel
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,8 +52,6 @@ class AuthActivity : BaseActivity() , NavController.OnDestinationChangedListener
         checkPreviousAuthUser()
     }
 
-
-
     private fun subscribeObservers(){
 
         viewModel.dataState.observe(this, Observer { dataState ->
@@ -51,6 +62,15 @@ class AuthActivity : BaseActivity() , NavController.OnDestinationChangedListener
                         it.authToken?.let {
                             Log.d(TAG, "AuthActivity, DataState: ${it}")
                             viewModel.setAuthToken(it)
+                        }
+                    }
+                }
+                data.response?.let{event ->
+                    event.peekContent().let{ response ->
+                        response.message?.let{ message ->
+                            if(message.equals(RESPONSE_CHECK_PREVIOUS_AUTH_USER_DONE)){
+                                onFinishCheckPreviousAuthUser()
+                            }
                         }
                     }
                 }
@@ -74,11 +94,6 @@ class AuthActivity : BaseActivity() , NavController.OnDestinationChangedListener
         })
     }
 
-
-    fun checkPreviousAuthUser(){
-        viewModel.setStateEvent(AuthStateEvent.CheckPreviousAuthEvent())
-    }
-
     fun navMainActivity(){
         Log.d(TAG, "navMainActivity: called.")
         val intent = Intent(this, MainActivity::class.java)
@@ -86,33 +101,27 @@ class AuthActivity : BaseActivity() , NavController.OnDestinationChangedListener
         finish()
     }
 
-    override fun onDestinationChanged(
-        controller: NavController,
-        destination: NavDestination,
-        arguments: Bundle?
-    ) {
-        viewModel.cancelActiveJobs()
+    private fun checkPreviousAuthUser(){
+        viewModel.setStateEvent(AuthStateEvent.CheckPreviousAuthEvent())
     }
 
-    override fun displayProgressBar(bool: Boolean) {
-        if (bool){
-            progress_bar.visibility == View.VISIBLE
-        } else {
-            progress_bar.visibility = View.INVISIBLE
+    private fun onFinishCheckPreviousAuthUser(){
+        fragment_container.visibility = View.VISIBLE
+    }
+
+    override fun displayProgressBar(bool: Boolean){
+        if(bool){
+            progress_bar.visibility = View.VISIBLE
+        }
+        else{
+            progress_bar.visibility = View.GONE
         }
     }
 
     override fun expandAppBar() {
-        //findViewById<AppBarLayout>(R.id.app_bar).setExpanded(true)
+        // ignore
     }
 }
-
-
-
-
-
-
-
 
 
 
