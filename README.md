@@ -5,8 +5,8 @@ Advanced coroutine management using jobs, Dagger2 , MVI , Caching , Retrofit , W
 
 
 <p float="left">
-  <img src="demo/screenshot_4.jpg" width="350" />
-    <img src="demo/screenshot_5.jpg" width="350" />
-   <img src="demo/screenshot_6.jpg" width="350" />
+  <img src="demo/screenshot_4.jpg" width="300" />
+    <img src="demo/screenshot_5.jpg" width="300" />
+   <img src="demo/screenshot_6.jpg" width="300" />
 </p>
 
